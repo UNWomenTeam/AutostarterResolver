@@ -1,18 +1,20 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/xela07ax/toolsXela/tp"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 )
 
 const (
-	//originFilePath = "/etc/resolv.conf"
-	originFilePath     = "/home/xela/Projects/back-encore-1/AutostarterResolver/dat/resolv.conf"
+	originFilePath = "/etc/resolv.conf"
+	//originFilePath     = "/home/xela/Projects/back-encore-1/AutostarterResolver/dat/resolv.conf"
 	fileTemplateResolv = "template.resolv"
 	replaceString      = "{DATA}"
 	logFileName        = "logix.log"
@@ -39,6 +41,7 @@ func main() {
 	tp.Fck(err)
 	logDir := filepath.Join(dir, logFileName)
 	logger := &MyLogger{logDir: logDir}
+	logger.WriteLog("Hola", false)
 	logger.WriteLog("Starting... Step 1 resolv", false)
 	// Step 1 resolv
 	fTemplateData, err := ioutil.ReadFile(filepath.Join(dir, fileTemplateResolv))
@@ -65,7 +68,19 @@ func main() {
 		logger.WriteLog(err.Error(), true)
 		tp.Fck(err)
 	}
-	// Step 2 nvidia power limit
+	// Step 2 nvidia power limit _ nvidia-smi -i 0 -pl 160
 	logger.WriteLog("Starting... Step 2 nvidia power limit", false)
+
+	cmd := exec.Command("nvidia-smi", "-i", "0", "-pl", "160")
+	var outb, errb bytes.Buffer
+	cmd.Stdout = &outb
+	cmd.Stderr = &errb
+	err = cmd.Run()
+	logger.WriteLog(fmt.Sprintf("out:%s| bin/bash:%s", outb.String(), errb.String()), false)
+	if err != nil {
+		logger.WriteLog(err.Error(), true)
+		tp.Fck(err)
+	}
+	logger.WriteLog("Good by", false)
 	fmt.Println("Good by! AutostarterResolver")
 }
