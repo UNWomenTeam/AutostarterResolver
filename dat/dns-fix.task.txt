@@ -1,0 +1,11 @@
+sudo vim /etc/resolv.conf
+
+nameserver 172.17.0.2
+Your IP
+search docker
+
+
+
+ubuntu nvidia power limit
+$nvidia-smi
+$sudo nvidia-smi -i 0 -pl 160
